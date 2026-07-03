@@ -11,7 +11,7 @@
 //   DISPUTED   — SoSoValue data contradicts the claimed direction
 //   UNPROVABLE — insufficient data to reconstruct (old timestamp, no API key, etc.)
 
-import { getNewsFeed, getFeaturedNews, getIndexSnapshot, getIndexList, getMarketSnapshot, summarizeSentiment } from './sosovalue.js';
+import { getNewsFeed, getFeaturedNews, getIndexSnapshot, getIndexList, getMarketSnapshot, summarizeSentiment, pickIndexTicker } from './sosovalue.js';
 import { getTickers } from './sodex.js';
 
 export async function verifyClaim(claim, { events } = {}) {
@@ -46,28 +46,14 @@ export async function verifyClaim(claim, { events } = {}) {
   if (claim.signal_basis === 'INDEX' || claim.signal_basis === 'BOTH') {
     emit('step', { step: 'SSI_INDEX', msg: 'Fetching SoSoValue SSI index snapshot...' });
     try {
-      // Get index list first if no indexId specified
-      let indexId = claim.indexId;
-      if (!indexId) {
-        const indexes = await getIndexList();
-        const idx = (indexes || []).find(i => {
-          const name = (i.name || i.indexName || '').toLowerCase();
-          return name.includes('btc') || name.includes('crypto') || name.includes('defi');
-        }) || (indexes || [])[0];
-        if (idx) indexId = idx.id || idx.indexId;
-      }
-
-      if (indexId) {
-        const snapshot = await getIndexSnapshot({ indexId });
-        const change = parseFloat(snapshot?.change || snapshot?.changePercent || '0');
-        evidence.index = { indexId, change, snapshot };
-        const indexSignal = change > 0 ? 'BULLISH' : change < 0 ? 'BEARISH' : 'NEUTRAL';
-        emit('step', { step: 'SSI_INDEX', msg: `SSI index ${indexId}: ${change > 0 ? '+' : ''}${change.toFixed(2)}% → ${indexSignal}` });
-        evidence.indexSignal = indexSignal;
-      } else {
-        warnings.push('No index available');
-        evidence.indexSignal = 'NEUTRAL';
-      }
+      const ticker = claim.indexId || pickIndexTicker(claim.currency);
+      const snapshot = await getIndexSnapshot(ticker);
+      const change = parseFloat(snapshot?.['24h_change_pct'] || '0');
+      const changePct = change * 100; // it's already a fraction e.g. -0.0016 = -0.16%
+      evidence.index = { ticker, changePct, snapshot };
+      const indexSignal = change > 0 ? 'BULLISH' : change < 0 ? 'BEARISH' : 'NEUTRAL';
+      emit('step', { step: 'SSI_INDEX', msg: `SSI ${ticker}: ${changePct >= 0 ? '+' : ''}${(changePct * 100).toFixed(2)}bp 24h → ${indexSignal}` });
+      evidence.indexSignal = indexSignal;
     } catch (e) {
       warnings.push(`Index fetch failed: ${e.message}`);
       emit('step', { step: 'SSI_INDEX', msg: `Warning: ${e.message} — using NEUTRAL` });

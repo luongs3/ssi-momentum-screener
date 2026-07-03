@@ -6,9 +6,20 @@ import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomBytes } from 'node:crypto';
+import { homedir } from 'node:os';
 import { verifyClaim } from './verifier.js';
 import { ReceiptChain } from './receipts.js';
 import { ping as sodexPing } from './sodex.js';
+
+// Pre-load the SoSoValue API key from the secrets file if not already in env
+if (!process.env.SOSOVALUE_API_KEY) {
+  try {
+    const keyFile = join(homedir(), '.config', 'me-secrets', 'sosovalue.txt');
+    if (existsSync(keyFile)) {
+      process.env.SOSOVALUE_API_KEY = readFileSync(keyFile, 'utf8').trim();
+    }
+  } catch { /* ignore */ }
+}
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT = parseInt(process.env.PORT || '8803');
