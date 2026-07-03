@@ -1,0 +1,441 @@
+[
+  {
+    "id": "c8ac98c3",
+    "ts": 1783094510426,
+    "type": "claim_received",
+    "payload": {
+      "claimId": "claim-demo-1",
+      "agent": "SoSoFlows v3",
+      "symbol": "vBTC_vUSDC",
+      "direction": "LONG"
+    },
+    "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "hash": "7a076f38cfb21a0b6b3fcb9a176cff05a43a878160df4fdc16bf12bb7e066532",
+    "sig": "38955f4c41a26017030734dbec57e1f811e63895aad3b72ec043cb2dc1dfc8ba"
+  },
+  {
+    "id": "9cc88614",
+    "ts": 1783094510426,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-demo-1",
+      "step": "INGEST",
+      "msg": "Auditing claim claim-demo-1 from agent \"SoSoFlows v3\""
+    },
+    "prevHash": "7a076f38cfb21a0b6b3fcb9a176cff05a43a878160df4fdc16bf12bb7e066532",
+    "hash": "8a0a9e62041761d5880678185e69f7812c01e89cef9bc311151ea4ca76c5109e",
+    "sig": "5911e2921885fe57ca6b9d92cf6693774743bd1530a684552e4562c1f1a90ce0"
+  },
+  {
+    "id": "24890a18",
+    "ts": 1783094510427,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-demo-1",
+      "step": "INGEST",
+      "msg": "Claimed: LONG vBTC_vUSDC based on BOTH"
+    },
+    "prevHash": "8a0a9e62041761d5880678185e69f7812c01e89cef9bc311151ea4ca76c5109e",
+    "hash": "fc66bb7f2c5f116cffa92006dad9a301cfcf42b41de18515f44706551b916aaf",
+    "sig": "f0ac7fbcc98dec80e61ffe82cee92b2cb4480d3755f8a9229c9a862de2ad5ea0"
+  },
+  {
+    "id": "9869ba3d",
+    "ts": 1783094510427,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-demo-1",
+      "step": "SOSOVALUE_NEWS",
+      "msg": "Fetching SoSoValue news feed..."
+    },
+    "prevHash": "fc66bb7f2c5f116cffa92006dad9a301cfcf42b41de18515f44706551b916aaf",
+    "hash": "2afdd869b3c6f8c2976ae985e0fccdff518d2f439af190a3f4839de64035591c",
+    "sig": "91a5903c464b9adb17d41a617a43fe90a6580c9d3e38e3781ff7f3fe5e1c4147"
+  },
+  {
+    "id": "73fc5f24",
+    "ts": 1783094510633,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-demo-1",
+      "step": "SOSOVALUE_NEWS",
+      "msg": "Warning: SoSoValue /news/featured → HTTP 401 — using NEUTRAL"
+    },
+    "prevHash": "2afdd869b3c6f8c2976ae985e0fccdff518d2f439af190a3f4839de64035591c",
+    "hash": "6ea4a6ceec05ac62f98298b9a45b91b5973249280f85efbf0cc90b4349a8db3e",
+    "sig": "fcbd30f3b2c8cb0ca00c92206fee919d45f7b1b21cb35c4f3e705b88249f0a37"
+  },
+  {
+    "id": "54865707",
+    "ts": 1783094510633,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-demo-1",
+      "step": "SSI_INDEX",
+      "msg": "Fetching SoSoValue SSI index snapshot..."
+    },
+    "prevHash": "6ea4a6ceec05ac62f98298b9a45b91b5973249280f85efbf0cc90b4349a8db3e",
+    "hash": "b736fae3a1604e806da739fd9f9d74b86ebf342914fdd77cf2336b8bcb3e34a5",
+    "sig": "3a100bd80dbaa7238f4f948f542a8c540a62effee3de96deb9c72dbabbdaf0aa"
+  },
+  {
+    "id": "6ac5e2ef",
+    "ts": 1783094510833,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-demo-1",
+      "step": "SSI_INDEX",
+      "msg": "Warning: SoSoValue /index/list → HTTP 401 — using NEUTRAL"
+    },
+    "prevHash": "b736fae3a1604e806da739fd9f9d74b86ebf342914fdd77cf2336b8bcb3e34a5",
+    "hash": "b4f069962edf7e5b7649bfa9d1d45ab0ba808e6ca50d513bc655dfca841ac55c",
+    "sig": "bcdbd0a659777570c2e92685b0fda36d744b66518459af37c98c5aa292f20123"
+  },
+  {
+    "id": "2d55d1bb",
+    "ts": 1783094510833,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-demo-1",
+      "step": "SODEX_PRICE",
+      "msg": "Checking SoDEX testnet price for vBTC_vUSDC..."
+    },
+    "prevHash": "b4f069962edf7e5b7649bfa9d1d45ab0ba808e6ca50d513bc655dfca841ac55c",
+    "hash": "0c59850067ddadb5ab9bcf89a18063b8daaa6a8aa8c27964cb2aedf9bab9534b",
+    "sig": "8ab8a58a78559f714228f4c38c0240151da57372bf832f9f0cb2b905a5e1f07f"
+  },
+  {
+    "id": "15f511dc",
+    "ts": 1783094511374,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-demo-1",
+      "step": "SODEX_PRICE",
+      "msg": "vBTC_vUSDC @ 62094 USDC (24h: +0.72%)"
+    },
+    "prevHash": "0c59850067ddadb5ab9bcf89a18063b8daaa6a8aa8c27964cb2aedf9bab9534b",
+    "hash": "99a14e6e3cffe496b24c4165c19bb153c817f076ab8f7d57b0a20e8326e3b430",
+    "sig": "a532a8c767661aad2a9c89b58773cc7afe2a257c3d67ec145f9344a30eafd5ff"
+  },
+  {
+    "id": "594cec76",
+    "ts": 1783094511374,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-demo-1",
+      "step": "VERDICT",
+      "msg": "Computing verdict..."
+    },
+    "prevHash": "99a14e6e3cffe496b24c4165c19bb153c817f076ab8f7d57b0a20e8326e3b430",
+    "hash": "c6ea28ac402d00f456e7a13db314f57d469dc160a469a393d02ebb270aad1581",
+    "sig": "325ace9027ae5582786cc4d95dfef449718fd6bff554f357ce1c1e951783d343"
+  },
+  {
+    "id": "2526e9e6",
+    "ts": 1783094511375,
+    "type": "verdict",
+    "payload": {
+      "claimId": "claim-demo-1",
+      "agent": "SoSoFlows v3",
+      "symbol": "vBTC_vUSDC",
+      "direction": "LONG",
+      "signal_basis": "BOTH",
+      "verdict": "UNPROVABLE",
+      "evidence": {
+        "news": {
+          "sentiment": "NEUTRAL",
+          "score": 0,
+          "count": 0
+        },
+        "indexSignal": "NEUTRAL",
+        "sodex": {
+          "symbol": "vBTC_vUSDC",
+          "lastPx": "62094",
+          "changePct": 0.72346223721775
+        }
+      },
+      "warnings": [
+        "News fetch failed: SoSoValue /news/featured → HTTP 401",
+        "Index fetch failed: SoSoValue /index/list → HTTP 401"
+      ],
+      "auditedAt": 1783094511375
+    },
+    "prevHash": "c6ea28ac402d00f456e7a13db314f57d469dc160a469a393d02ebb270aad1581",
+    "hash": "bd1b10314dca72176d84e0c71df24278d9b74ed08e22672f6e1edcb8b1b03e18",
+    "sig": "87c9bc2043ee3896b1c826323205688f6fa0b7d9e63657297f13ae415679b2b0"
+  },
+  {
+    "id": "6f4985c6",
+    "ts": 1783094542507,
+    "type": "claim_received",
+    "payload": {
+      "claimId": "claim-demo-2",
+      "agent": "earlynotwrong",
+      "symbol": "vETH_vUSDC",
+      "direction": "SHORT"
+    },
+    "prevHash": "bd1b10314dca72176d84e0c71df24278d9b74ed08e22672f6e1edcb8b1b03e18",
+    "hash": "e435a16a7383142bf8558b3070e93fef76ae5bf9378883ea8f1695e74fec2990",
+    "sig": "1ce5dd3cfd951463c180702ef9f752cd6db42ae01f461614dced3a91331f6f14"
+  },
+  {
+    "id": "e7646151",
+    "ts": 1783094542508,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-demo-2",
+      "step": "INGEST",
+      "msg": "Auditing claim claim-demo-2 from agent \"earlynotwrong\""
+    },
+    "prevHash": "e435a16a7383142bf8558b3070e93fef76ae5bf9378883ea8f1695e74fec2990",
+    "hash": "f0a34ef18024428cc54e61f5e807abaf950af6ba835a36676d0ab4f7a8c7e846",
+    "sig": "17ead1d3edaa640c456fcd33585ca6e9f9287abb864c4bcba51c7ef24a896342"
+  },
+  {
+    "id": "4c1dabbc",
+    "ts": 1783094542508,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-demo-2",
+      "step": "INGEST",
+      "msg": "Claimed: SHORT vETH_vUSDC based on NEWS"
+    },
+    "prevHash": "f0a34ef18024428cc54e61f5e807abaf950af6ba835a36676d0ab4f7a8c7e846",
+    "hash": "82c9e79bcca68dda2b74f5bf6cd69efa9426cbec020f4d97b5e4f04f5c0c66b5",
+    "sig": "1dd532565f107a920b4785e4f4ea270152a278be2bb1989b5d35526618d7f7e1"
+  },
+  {
+    "id": "097d8897",
+    "ts": 1783094542508,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-demo-2",
+      "step": "SOSOVALUE_NEWS",
+      "msg": "Fetching SoSoValue news feed..."
+    },
+    "prevHash": "82c9e79bcca68dda2b74f5bf6cd69efa9426cbec020f4d97b5e4f04f5c0c66b5",
+    "hash": "af4da1979edfe28be12f12e17885e6506c86d551065e0b733e9e06482335cd82",
+    "sig": "dee94507345b4dd410376798e44f0bce3cda1bc2ed62ec1799d353e4ebc3ff91"
+  },
+  {
+    "id": "62440fc0",
+    "ts": 1783094542681,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-demo-2",
+      "step": "SOSOVALUE_NEWS",
+      "msg": "Warning: SoSoValue /news/featured → HTTP 401 — using NEUTRAL"
+    },
+    "prevHash": "af4da1979edfe28be12f12e17885e6506c86d551065e0b733e9e06482335cd82",
+    "hash": "e7d8d12609653dee6a78fcf0827f2c5459dbaf75456907b4bf6607d20dcf794b",
+    "sig": "f9b5d1045492185c2fa4d4d692caf462a761ec9731367d6a82f22bfaddd8600b"
+  },
+  {
+    "id": "7ab102a8",
+    "ts": 1783094542681,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-demo-2",
+      "step": "SODEX_PRICE",
+      "msg": "Checking SoDEX testnet price for vETH_vUSDC..."
+    },
+    "prevHash": "e7d8d12609653dee6a78fcf0827f2c5459dbaf75456907b4bf6607d20dcf794b",
+    "hash": "989dd9a5dfa689c4abb4f8eb5a22cc0b0dfc194b87c440d8d2458c5c4cea2fde",
+    "sig": "18b9e50db120cef5b0c3493f0b84d2813301d9bb6e042c035dfa88b8ed996f78"
+  },
+  {
+    "id": "7f60d95f",
+    "ts": 1783094543282,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-demo-2",
+      "step": "SODEX_PRICE",
+      "msg": "vETH_vUSDC @ 2068.7 USDC (24h: -0.00%)"
+    },
+    "prevHash": "989dd9a5dfa689c4abb4f8eb5a22cc0b0dfc194b87c440d8d2458c5c4cea2fde",
+    "hash": "e5e58629496fe96f9afae467272a9ebd97c49614d1b9f32766d7fb801c1cc58d",
+    "sig": "27f496e8fee5d7ad27898fab1db640b599b5e3c2a042c37fe95cf39e17915ccf"
+  },
+  {
+    "id": "c0d8deb7",
+    "ts": 1783094543282,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-demo-2",
+      "step": "VERDICT",
+      "msg": "Computing verdict..."
+    },
+    "prevHash": "e5e58629496fe96f9afae467272a9ebd97c49614d1b9f32766d7fb801c1cc58d",
+    "hash": "c909fd26af4514a4da12e0f8401c33af823af580c9fe018c398437ed90eb5606",
+    "sig": "c1ed5942b8310ad4c830b5da3a453d58e0e62eb536e09bff643354d91a86e947"
+  },
+  {
+    "id": "786a41d2",
+    "ts": 1783094543282,
+    "type": "verdict",
+    "payload": {
+      "claimId": "claim-demo-2",
+      "agent": "earlynotwrong",
+      "symbol": "vETH_vUSDC",
+      "direction": "SHORT",
+      "signal_basis": "NEWS",
+      "verdict": "UNPROVABLE",
+      "evidence": {
+        "news": {
+          "sentiment": "NEUTRAL",
+          "score": 0,
+          "count": 0
+        },
+        "sodex": {
+          "symbol": "vETH_vUSDC",
+          "lastPx": "2068.7",
+          "changePct": -0.00483372003094
+        }
+      },
+      "warnings": [
+        "News fetch failed: SoSoValue /news/featured → HTTP 401"
+      ],
+      "auditedAt": 1783094543282
+    },
+    "prevHash": "c909fd26af4514a4da12e0f8401c33af823af580c9fe018c398437ed90eb5606",
+    "hash": "c10821d0a9d5bf73c90bd0aeb37009f31a059969f4e90fc46f723ea8fb8829c5",
+    "sig": "e61d03ea344dc51a531d9b27a3b5324134a96e170246b878ddfaebbbebb3de49"
+  },
+  {
+    "id": "0becaf9d",
+    "ts": 1783094554542,
+    "type": "claim_received",
+    "payload": {
+      "claimId": "claim-09b1bb58",
+      "agent": "Bellwether",
+      "symbol": "vBTC_vUSDC",
+      "direction": "LONG"
+    },
+    "prevHash": "c10821d0a9d5bf73c90bd0aeb37009f31a059969f4e90fc46f723ea8fb8829c5",
+    "hash": "f72408d14edf222ddb1d653a62416b4ae0cf8eb6f2d142884c9c7e1d606b2e4c",
+    "sig": "a273f8a0ec39260fa5fe0e26f689793926f7b77dfdfaad940843483248eda595"
+  },
+  {
+    "id": "a30d4365",
+    "ts": 1783094554543,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-09b1bb58",
+      "step": "INGEST",
+      "msg": "Auditing claim claim-09b1bb58 from agent \"Bellwether\""
+    },
+    "prevHash": "f72408d14edf222ddb1d653a62416b4ae0cf8eb6f2d142884c9c7e1d606b2e4c",
+    "hash": "610486ccdd5722ac3134ee2cd97d477a4729f27be752120b41b2e66a0e786c63",
+    "sig": "58904e848020a0f41fa7351d89877bc9142d5dbc473b6f2216e33d0aa4a32d8e"
+  },
+  {
+    "id": "b10c00ad",
+    "ts": 1783094554543,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-09b1bb58",
+      "step": "INGEST",
+      "msg": "Claimed: LONG vBTC_vUSDC based on NEWS"
+    },
+    "prevHash": "610486ccdd5722ac3134ee2cd97d477a4729f27be752120b41b2e66a0e786c63",
+    "hash": "74178dc5b49e806e735031ec548efa1c020cd4b23359becebf6d32d88c574872",
+    "sig": "f9ced427152c600a19ed8044848b7e9420c8a156d0f8bcb10b3561fdf9ba2acf"
+  },
+  {
+    "id": "27bdaf7a",
+    "ts": 1783094554543,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-09b1bb58",
+      "step": "SOSOVALUE_NEWS",
+      "msg": "Fetching SoSoValue news feed..."
+    },
+    "prevHash": "74178dc5b49e806e735031ec548efa1c020cd4b23359becebf6d32d88c574872",
+    "hash": "9d5100ed9dae009623497cba997351c212d39ed70154d97d3b138745af8b008a",
+    "sig": "5a6f0868da59a69dd5d1563ebe012314cb5627043b872ee5ea12c64e6e5f3448"
+  },
+  {
+    "id": "ac75ef6e",
+    "ts": 1783094554739,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-09b1bb58",
+      "step": "SOSOVALUE_NEWS",
+      "msg": "Warning: SoSoValue /news/featured → HTTP 401 — using NEUTRAL"
+    },
+    "prevHash": "9d5100ed9dae009623497cba997351c212d39ed70154d97d3b138745af8b008a",
+    "hash": "7f5d309d0b0eaea2e12831efb439df075d24ef38fb201d04f63d571016a15867",
+    "sig": "8f8ef5d6ab5ae14c707940b47ea2848e0e5f8b291825f1ebef7986e5eff438c0"
+  },
+  {
+    "id": "31a64cdf",
+    "ts": 1783094554739,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-09b1bb58",
+      "step": "SODEX_PRICE",
+      "msg": "Checking SoDEX testnet price for vBTC_vUSDC..."
+    },
+    "prevHash": "7f5d309d0b0eaea2e12831efb439df075d24ef38fb201d04f63d571016a15867",
+    "hash": "534feb9e2753e4ee663add6254d03da7d264f84368f939c1ae3ab886a61957f8",
+    "sig": "23feb120201cf6bed248de8f0eb471bb7461f0500b33fa37eba1905aa08b5856"
+  },
+  {
+    "id": "726b3fb3",
+    "ts": 1783094555048,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-09b1bb58",
+      "step": "SODEX_PRICE",
+      "msg": "vBTC_vUSDC @ 62094 USDC (24h: +0.72%)"
+    },
+    "prevHash": "534feb9e2753e4ee663add6254d03da7d264f84368f939c1ae3ab886a61957f8",
+    "hash": "c672061ebc3c95962335efce32817bd1a10fd166f5149816a895593fcdb0bd13",
+    "sig": "7f84dfd4db6907733348429fed3f764b6fc348a0a572ae9744c6c2b3eb398d11"
+  },
+  {
+    "id": "0fad18c0",
+    "ts": 1783094555049,
+    "type": "audit_step",
+    "payload": {
+      "claimId": "claim-09b1bb58",
+      "step": "VERDICT",
+      "msg": "Computing verdict..."
+    },
+    "prevHash": "c672061ebc3c95962335efce32817bd1a10fd166f5149816a895593fcdb0bd13",
+    "hash": "465b0eb80f120faeac068449065fa851ed69932dc76acf999d570aa840e7d948",
+    "sig": "4d74f45816cf74cc84371f0d24385dfeeefd1fa6ec6c893b2c805b0e43b9646e"
+  },
+  {
+    "id": "7516ef17",
+    "ts": 1783094555049,
+    "type": "verdict",
+    "payload": {
+      "claimId": "claim-09b1bb58",
+      "agent": "Bellwether",
+      "symbol": "vBTC_vUSDC",
+      "direction": "LONG",
+      "signal_basis": "NEWS",
+      "verdict": "UNPROVABLE",
+      "evidence": {
+        "news": {
+          "sentiment": "NEUTRAL",
+          "score": 0,
+          "count": 0
+        },
+        "sodex": {
+          "symbol": "vBTC_vUSDC",
+          "lastPx": "62094",
+          "changePct": 0.72346223721775
+        }
+      },
+      "warnings": [
+        "News fetch failed: SoSoValue /news/featured → HTTP 401"
+      ],
+      "auditedAt": 1783094555049
+    },
+    "prevHash": "465b0eb80f120faeac068449065fa851ed69932dc76acf999d570aa840e7d948",
+    "hash": "43b5cf62de355dd9c2cfeddcaaea4fc1a932ac88e8312f50859f1ff172c284a3",
+    "sig": "45b846ff469e4f441dce2c2cbc6bd602a483b1c25849c1fad33e2d3e76eb3c6a"
+  }
+]

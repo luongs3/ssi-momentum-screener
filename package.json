@@ -1,0 +1,15 @@
+{
+  "name": "signal-court",
+  "version": "1.0.0",
+  "description": "On-chain claim verifier for SoSoValue-data-backed trading signals — WaveHack Wave 3",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node test/verify.test.js",
+    "verify-claim": "node src/run.js"
+  },
+  "dependencies": {
+    "ethers": "^6.13.0"
+  },
+  "engines": { "node": ">=18" }
+}
