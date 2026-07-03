@@ -1,0 +1,4 @@
+node_modules/
+.signal-court/
+*.log
+.env
