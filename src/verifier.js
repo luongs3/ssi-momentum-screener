@@ -128,6 +128,6 @@ export async function verifyClaim(claim, { events } = {}) {
     auditedAt: Date.now(),
   };
 
-  emit('verdict', result);
+  // Note: do NOT emit('verdict') here — the server will broadcast it after adding to docket
   return result;
 }

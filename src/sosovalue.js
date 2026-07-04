@@ -76,14 +76,32 @@ export async function getMarketSnapshot(currency) {
 }
 
 // ── Sentiment summarizer ────────────────────────────────────────────────────
+const TICKER_ALIASES = {
+  BTC: ['bitcoin', 'btc'],
+  ETH: ['ethereum', 'eth', 'ether'],
+  SOL: ['solana', 'sol'],
+  BNB: ['bnb', 'binance'],
+  XRP: ['xrp', 'ripple'],
+  ADA: ['cardano', 'ada'],
+  DOGE: ['dogecoin', 'doge'],
+  AVAX: ['avalanche', 'avax'],
+  DOT: ['polkadot', 'dot'],
+  MATIC: ['polygon', 'matic'],
+};
+
 export function summarizeSentiment(newsItems, { currency } = {}) {
   if (!newsItems || !newsItems.length) return { sentiment: 'NEUTRAL', score: 0, count: 0, items: [] };
 
-  const relevant = currency
+  const aliases = currency
+    ? [currency.toLowerCase(), ...(TICKER_ALIASES[currency.toUpperCase()] || [])]
+    : null;
+
+  const relevant = aliases
     ? newsItems.filter(n => {
         const text = (n.title || '') + ' ' + (n.content || '') + ' ' +
           JSON.stringify(n.matched_currencies || []);
-        return text.toLowerCase().includes(currency.toLowerCase());
+        const lower = text.toLowerCase();
+        return aliases.some(a => lower.includes(a));
       })
     : newsItems;
 
