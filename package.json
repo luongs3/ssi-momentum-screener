@@ -1,14 +1,14 @@
 {
-  "name": "signal-court",
+  "name": "ssi-momentum-screener",
   "version": "1.0.0",
-  "description": "On-chain claim verifier for SoSoValue-data-backed trading signals — WaveHack Wave 3",
+  "description": "Real-time SSI sector rotation screener powered by SoSoValue — SoSoValue WaveHack Wave 3",
   "type": "module",
   "scripts": {
     "start": "node src/server.js",
-    "test": "node test/verify.test.js",
-    "verify-claim": "node src/run.js"
+    "test": "node --test test/screener.test.js"
   },
   "dependencies": {
+    "express": "^4.18.2",
     "ethers": "^6.13.0"
   },
   "engines": { "node": ">=18" }

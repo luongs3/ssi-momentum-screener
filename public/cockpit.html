@@ -1,240 +1,332 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SignalCourt — On-Chain Claim Verifier</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SSI Momentum Screener — SoSoValue</title>
 <style>
-  :root{--bg:#0a0e1a;--card:#0f1628;--border:#1e2d4f;--accent:#5a9eff;--green:#50c878;--red:#e05050;--orange:#f5a623;--purple:#b08cff;--gray:#7a8aa0;--white:#e8eaf2;font-family:ui-monospace,'JetBrains Mono','Fira Code',monospace}
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--white);min-height:100vh;padding:0}
-  header{background:var(--card);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:16px}
-  header h1{font-size:1.1rem;color:var(--accent);letter-spacing:.03em}
-  header span{font-size:.75rem;color:var(--gray)}
-  .badge{padding:3px 10px;border-radius:4px;font-size:.7rem;border:1px solid;margin-left:auto}
-  .badge.idle{border-color:var(--gray);color:var(--gray)}
-  .badge.running{border-color:var(--accent);color:var(--accent);animation:pulse 1.2s ease-in-out infinite}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-  main{display:grid;grid-template-columns:1fr 380px;gap:1px;height:calc(100vh - 57px);overflow:hidden}
-  .panel{background:var(--card);border:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
-  .panel-title{padding:10px 16px;font-size:.7rem;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);flex-shrink:0}
-  .panel-body{overflow-y:auto;flex:1;padding:12px}
-  .panel-body::-webkit-scrollbar{width:4px}
-  .panel-body::-webkit-scrollbar-thumb{background:var(--border)}
+:root {
+  --bg: #0d1117; --surface: #161b22; --border: #30363d;
+  --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+  --up: #3fb950; --down: #f85149; --neutral: #d29922;
+  --strong-up: #39d353; --strong-down: #da3633;
+  --pill-up: #1a3a2a; --pill-down: #3a1a1a; --pill-neutral: #3a2a0a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; }
 
-  /* Docket cards */
-  .claim-card{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:10px}
-  .claim-card .header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-  .claim-card .agent{font-size:.8rem;color:var(--white);font-weight:600}
-  .claim-card .meta{font-size:.7rem;color:var(--gray)}
-  .claim-card .direction{font-size:.7rem;padding:2px 8px;border-radius:3px;font-weight:700}
-  .direction.LONG{background:#1a3320;color:var(--green);border:1px solid var(--green)}
-  .direction.SHORT{background:#331a1a;color:var(--red);border:1px solid var(--red)}
-  .verdict-badge{margin-left:auto;font-size:.7rem;padding:3px 10px;border-radius:4px;font-weight:700;letter-spacing:.05em}
-  .verdict-badge.CONFIRMED{background:#1a3320;color:var(--green);border:1px solid var(--green)}
-  .verdict-badge.DISPUTED{background:#331a1a;color:var(--red);border:1px solid var(--red)}
-  .verdict-badge.UNPROVABLE{background:#2a2520;color:var(--orange);border:1px solid var(--orange)}
-  .verdict-badge.AUDITING{background:#1a2240;color:var(--accent);border:1px solid var(--accent)}
-  .evidence{font-size:.7rem;color:var(--gray);margin-top:6px;border-top:1px solid var(--border);padding-top:6px}
-  .evidence span{color:var(--white)}
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo svg { width: 28px; height: 28px; }
+.logo h1 { font-size: 16px; font-weight: 700; letter-spacing: .5px; color: var(--text); }
+.logo small { font-size: 11px; color: var(--muted); }
+#status { font-size: 11px; color: var(--muted); }
+#status.live { color: var(--up); }
 
-  /* Thought stream */
-  .thought{padding:6px 0;border-bottom:1px solid rgba(30,45,79,.4);font-size:.72rem;line-height:1.5}
-  .thought .phase{font-weight:700;margin-right:6px}
-  .thought .phase.INGEST{color:var(--accent)}
-  .thought .phase.SOSOVALUE_NEWS{color:var(--purple)}
-  .thought .phase.SSI_INDEX{color:var(--orange)}
-  .thought .phase.SODEX_PRICE{color:var(--green)}
-  .thought .phase.VERDICT{color:var(--white)}
-  .verdict-full{padding:12px;background:var(--bg);border-radius:6px;border:1px solid var(--border);margin-top:8px}
+.container { max-width: 1100px; margin: 0 auto; padding: 20px; }
 
-  /* Submit form */
-  .submit-form{padding:12px;border-top:1px solid var(--border);flex-shrink:0}
-  .submit-form h3{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:8px}
-  .form-row{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}
-  select,input{background:var(--bg);color:var(--white);border:1px solid var(--border);border-radius:4px;padding:5px 8px;font-size:.75rem;font-family:inherit;flex:1;min-width:80px}
-  button{background:var(--accent);color:#000;border:none;padding:6px 14px;border-radius:4px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:inherit}
-  button:hover{filter:brightness(1.1)}
-  button.demo{background:var(--border);color:var(--gray)}
-  button.demo:hover{background:var(--gray);color:var(--bg)}
-  .kpi-row{display:flex;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
-  .kpi{text-align:center;flex:1}
-  .kpi .val{font-size:1.2rem;font-weight:700;color:var(--accent)}
-  .kpi .lbl{font-size:.6rem;color:var(--gray);text-transform:uppercase;letter-spacing:.06em}
+/* ── Table ── */
+.screener-table {
+  width: 100%; border-collapse: collapse;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  overflow: hidden;
+}
+.screener-table th {
+  text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 600;
+  color: var(--muted); text-transform: uppercase; letter-spacing: .7px;
+  background: #0d1117; border-bottom: 1px solid var(--border);
+}
+.screener-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.screener-table tr:last-child td { border-bottom: none; }
+.screener-table tr { cursor: pointer; transition: background .15s; }
+.screener-table tr:hover td { background: rgba(88,166,255,.04); }
+
+.rank { color: var(--muted); font-size: 12px; width: 30px; }
+.ticker { font-weight: 700; font-size: 13px; color: var(--accent); }
+.label-col { color: var(--muted); font-size: 12px; }
+.change { font-weight: 600; }
+.change.pos { color: var(--up); }
+.change.neg { color: var(--down); }
+.change.zero { color: var(--muted); }
+
+.score-bar-cell { width: 120px; }
+.score-bar-wrap { background: var(--border); border-radius: 4px; height: 8px; width: 100%; overflow: hidden; }
+.score-bar-fill { height: 100%; border-radius: 4px; transition: width .6s ease; }
+.strong-up   .score-bar-fill { background: var(--strong-up); }
+.up          .score-bar-fill { background: var(--up); }
+.neutral     .score-bar-fill { background: var(--neutral); }
+.down        .score-bar-fill { background: var(--down); }
+.strong-down .score-bar-fill { background: var(--strong-down); }
+
+.momentum-pill {
+  display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;
+}
+.momentum-pill.strong-up   { background: var(--pill-up);      color: var(--strong-up); }
+.momentum-pill.up          { background: var(--pill-up);      color: var(--up); }
+.momentum-pill.neutral     { background: var(--pill-neutral); color: var(--neutral); }
+.momentum-pill.down        { background: var(--pill-down);    color: var(--down); }
+.momentum-pill.strong-down { background: var(--pill-down);    color: var(--strong-down); }
+
+/* ── News panel ── */
+.news-panel {
+  display: none; padding: 12px 14px 16px; background: #0d1117;
+  border-top: 1px solid var(--border);
+}
+.news-panel.open { display: block; }
+.news-panel h3 { font-size: 11px; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .5px; }
+.news-item { margin-bottom: 6px; }
+.news-item a { color: var(--accent); text-decoration: none; font-size: 12px; }
+.news-item a:hover { text-decoration: underline; }
+.news-item .news-time { color: var(--muted); font-size: 10px; margin-left: 6px; }
+.news-loading { color: var(--muted); font-size: 12px; font-style: italic; }
+.no-news { color: var(--muted); font-size: 12px; }
+
+/* ── Snapshot ledger ── */
+.ledger {
+  margin-top: 24px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; overflow: hidden;
+}
+.ledger-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; border-bottom: 1px solid var(--border); background: #0d1117;
+}
+.ledger-header h2 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+.ledger-entry { padding: 8px 14px; border-bottom: 1px solid var(--border); font-size: 11px; color: var(--muted); }
+.ledger-entry:last-child { border-bottom: none; }
+.ledger-entry .le-time { color: var(--text); }
+.ledger-entry .le-top { color: var(--accent); }
+.ledger-entry .le-hash { font-family: monospace; color: var(--muted); font-size: 10px; }
+.le-onchain { color: var(--up); margin-left: 4px; }
+.le-local { color: var(--muted); margin-left: 4px; }
+
+/* ── Footer ── */
+footer { margin-top: 32px; text-align: center; color: var(--muted); font-size: 11px; padding: 16px; }
+footer a { color: var(--accent); text-decoration: none; }
+
+#last-update { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
 </style>
 </head>
 <body>
-<header>
-  <h1>⚖ SignalCourt</h1>
-  <span>On-chain claim verifier for SoSoValue-data-backed signals — WaveHack Wave 3</span>
-  <div class="badge idle" id="statusBadge">IDLE</div>
-</header>
-<main>
-  <!-- LEFT: Audit docket -->
-  <div style="display:flex;flex-direction:column;overflow:hidden">
-    <div class="kpi-row" id="kpis">
-      <div class="kpi"><div class="val" id="kpiTotal">0</div><div class="lbl">Claims Audited</div></div>
-      <div class="kpi"><div class="val" style="color:var(--green)" id="kpiConfirmed">0</div><div class="lbl">Confirmed</div></div>
-      <div class="kpi"><div class="val" style="color:var(--red)" id="kpiDisputed">0</div><div class="lbl">Disputed</div></div>
-      <div class="kpi"><div class="val" style="color:var(--orange)" id="kpiUnprovable">0</div><div class="lbl">Unprovable</div></div>
-    </div>
-    <div class="panel" style="flex:1">
-      <div class="panel-title">Audit Docket — verified claims</div>
-      <div class="panel-body" id="docket"></div>
-    </div>
-    <!-- Submit -->
-    <div class="submit-form">
-      <h3>Submit a claim for audit</h3>
-      <div class="form-row">
-        <input id="claimAgent" placeholder="Agent name" value="My Trading Agent">
-        <select id="claimSymbol">
-          <option value="vBTC_vUSDC">BTC/USDC</option>
-          <option value="vETH_vUSDC">ETH/USDC</option>
-          <option value="vSOL_vUSDC">SOL/USDC</option>
-        </select>
-        <select id="claimDir"><option value="LONG">LONG</option><option value="SHORT">SHORT</option></select>
-        <select id="claimBasis"><option value="NEWS">NEWS</option><option value="INDEX">INDEX</option><option value="BOTH">BOTH</option></select>
-      </div>
-      <div class="form-row">
-        <input id="claimCurrency" placeholder="Currency e.g. BTC" value="BTC">
-        <button onclick="submitClaim()">▶ Audit Claim</button>
-        <button class="demo" onclick="runDemo(0)">Demo #1</button>
-        <button class="demo" onclick="runDemo(1)">Demo #2</button>
-      </div>
-    </div>
-  </div>
 
-  <!-- RIGHT: Thought stream -->
-  <div style="display:flex;flex-direction:column;overflow:hidden">
-    <div class="panel" style="flex:1">
-      <div class="panel-title">Agent Thought-Stream — live audit trace</div>
-      <div class="panel-body" id="thoughts"></div>
-    </div>
-    <div class="panel" style="height:120px">
-      <div class="panel-title">Receipt Chain</div>
-      <div class="panel-body" style="font-size:.7rem" id="receipts">Loading...</div>
+<header>
+  <div class="logo">
+    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="28" height="28" rx="6" fill="#161b22"/>
+      <path d="M6 20l5-8 4 5 3-4 4 7H6z" fill="#58a6ff" opacity=".8"/>
+      <circle cx="20" cy="9" r="3" fill="#3fb950"/>
+    </svg>
+    <div>
+      <h1>SSI Momentum Screener</h1>
+      <small>Powered by SoSoValue · Built on SoDEX / ValueChain</small>
     </div>
   </div>
-</main>
+  <span id="status">connecting…</span>
+</header>
+
+<div class="container">
+  <div id="last-update"></div>
+
+  <table class="screener-table" id="screener-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Index</th>
+        <th>Sector</th>
+        <th>Price</th>
+        <th>24h</th>
+        <th>7d</th>
+        <th>1m</th>
+        <th>Momentum Score</th>
+        <th>Signal</th>
+      </tr>
+    </thead>
+    <tbody id="screener-body">
+      <tr><td colspan="9" style="color:var(--muted);padding:20px;text-align:center">Loading…</td></tr>
+    </tbody>
+  </table>
+
+  <div class="ledger" id="ledger">
+    <div class="ledger-header">
+      <h2>⛓ On-Chain Snapshots (Hourly · SoDEX / ValueChain)</h2>
+      <span style="font-size:11px;color:var(--muted)" id="snap-count"></span>
+    </div>
+    <div id="ledger-body">
+      <div class="ledger-entry" style="color:var(--muted)">Loading snapshot ledger…</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  SSI Momentum Screener · <a href="https://github.com/luongs3/sosovalue-screener" target="_blank">GitHub</a> ·
+  Data: <a href="https://sosovalue.com" target="_blank">SoSoValue</a> ·
+  On-chain: <a href="https://testnet.sodex.dev" target="_blank">SoDEX Testnet</a>
+</footer>
 
 <script>
-const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-let docket=[], receipts=0, chainOk=true;
+const tbody = document.getElementById('screener-body');
+const statusEl = document.getElementById('status');
+const ledgerBody = document.getElementById('ledger-body');
+const snapCount = document.getElementById('snap-count');
+const lastUpdate = document.getElementById('last-update');
 
-function updateKPIs(){
-  document.getElementById('kpiTotal').textContent=docket.length;
-  document.getElementById('kpiConfirmed').textContent=docket.filter(d=>d.verdict==='CONFIRMED').length;
-  document.getElementById('kpiDisputed').textContent=docket.filter(d=>d.verdict==='DISPUTED').length;
-  document.getElementById('kpiUnprovable').textContent=docket.filter(d=>d.verdict==='UNPROVABLE').length;
+let openNewsRow = null; // ticker of currently open news panel
+
+function pct(v) {
+  if (v == null) return '—';
+  const s = (v >= 0 ? '+' : '') + (v * 100).toFixed(2) + '%';
+  return s;
+}
+function pctClass(v) {
+  if (v == null || v === 0) return 'zero';
+  return v > 0 ? 'pos' : 'neg';
+}
+function formatPrice(p) {
+  if (p == null) return '—';
+  return '$' + (+p).toFixed(4);
+}
+function timeAgo(ts) {
+  const d = Date.now() - ts;
+  if (d < 60000) return Math.floor(d/1000) + 's ago';
+  if (d < 3600000) return Math.floor(d/60000) + 'm ago';
+  return Math.floor(d/3600000) + 'h ago';
 }
 
-function renderDocket(){
-  const el=document.getElementById('docket');
-  el.innerHTML=docket.map(d=>{
-    const ev=d.evidence||{};
-    const newsSent=ev.news?ev.news.sentiment:'—';
-    const idxSent=ev.indexSignal||'—';
-    const sodexPx=ev.sodex?ev.sodex.lastPx:'—';
-    return`<div class="claim-card">
-      <div class="header">
-        <span class="agent">${esc(d.agent)}</span>
-        <span class="direction ${esc(d.direction)}">${esc(d.direction)}</span>
-        <span class="meta">${esc(d.symbol)}</span>
-        <span class="verdict-badge ${esc(d.verdict)}">${esc(d.verdict)}</span>
-      </div>
-      <div class="evidence">
-        SoSoValue News: <span>${esc(newsSent)}</span> &nbsp;·&nbsp;
-        SSI Index: <span>${esc(idxSent)}</span> &nbsp;·&nbsp;
-        SoDEX price: <span>${esc(sodexPx)}</span>
-        ${d.warnings&&d.warnings.length?'<br>⚠ '+d.warnings.map(esc).join('; '):''}
-      </div>
+function renderTable(data) {
+  tbody.innerHTML = '';
+  data.forEach((row, i) => {
+    const m = row.momentum;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="rank">${i+1}</td>
+      <td class="ticker">${row.ticker}</td>
+      <td class="label-col">${row.label || row.ticker}</td>
+      <td>${formatPrice(row.price)}</td>
+      <td class="change ${pctClass(row.change_pct_24h)}">${pct(row.change_pct_24h)}</td>
+      <td class="change ${pctClass(row.roi_7d)}">${pct(row.roi_7d)}</td>
+      <td class="change ${pctClass(row.roi_1m)}">${pct(row.roi_1m)}</td>
+      <td class="score-bar-cell ${m.css}">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="score-bar-wrap" style="flex:1">
+            <div class="score-bar-fill" style="width:${Math.round(row.score*100)}%"></div>
+          </div>
+          <span style="font-size:11px;color:var(--muted);width:30px;text-align:right">${Math.round(row.score*100)}</span>
+        </div>
+      </td>
+      <td><span class="momentum-pill ${m.css}">${m.emoji} ${m.label}</span></td>
+    `;
+
+    // News panel row
+    const newsTr = document.createElement('tr');
+    const newsTd = document.createElement('td');
+    newsTd.colSpan = 9;
+    newsTd.style.padding = 0;
+    const newsPanel = document.createElement('div');
+    newsPanel.className = 'news-panel';
+    newsPanel.dataset.ticker = row.ticker;
+    newsTd.appendChild(newsPanel);
+    newsTr.appendChild(newsTd);
+
+    tr.addEventListener('click', () => toggleNews(row.ticker, m.css, newsPanel, tr));
+
+    tbody.appendChild(tr);
+    tbody.appendChild(newsTr);
+  });
+}
+
+async function toggleNews(ticker, cssClass, panel, tr) {
+  const isOpen = panel.classList.contains('open');
+
+  // Close any open panel
+  document.querySelectorAll('.news-panel.open').forEach(p => {
+    p.classList.remove('open');
+    p.innerHTML = '';
+  });
+
+  if (isOpen) return; // was open → just close
+
+  panel.classList.add('open');
+  panel.innerHTML = `<h3>📰 ${ticker} — Related SoSoValue News</h3><div class="news-loading">Loading…</div>`;
+
+  try {
+    const res = await fetch('/api/news/' + ticker);
+    const { items } = await res.json();
+    if (!items || items.length === 0) {
+      panel.innerHTML = `<h3>📰 ${ticker} — Related News</h3><div class="no-news">No recent news matched for this index.</div>`;
+      return;
+    }
+    panel.innerHTML = `<h3>📰 ${ticker} — Why it's moving (SoSoValue News)</h3>` +
+      items.map(n => `
+        <div class="news-item">
+          <a href="${n.url || '#'}" target="_blank">${n.title}</a>
+          ${n.time ? `<span class="news-time">${new Date(n.time * 1000 || n.time).toLocaleTimeString()}</span>` : ''}
+        </div>`).join('');
+  } catch(e) {
+    panel.innerHTML = `<h3>📰 ${ticker}</h3><div class="no-news">Failed to load news: ${e.message}</div>`;
+  }
+}
+
+function renderLedger(data) {
+  if (!data || !data.length) {
+    ledgerBody.innerHTML = '<div class="ledger-entry" style="color:var(--muted)">No snapshots yet — first snapshot queued…</div>';
+    snapCount.textContent = '';
+    return;
+  }
+  snapCount.textContent = data.length + ' entries';
+  ledgerBody.innerHTML = data.slice(0, 12).map(s => {
+    const top = s.top3.map(t => `${t.ticker} (${t.momentum})`).join(' · ');
+    const chain = s.onChain
+      ? `<span class="le-onchain">⛓ on-chain</span>`
+      : `<span class="le-local">📋 local</span>`;
+    return `<div class="ledger-entry">
+      <span class="le-time">${s.iso || s.ts}</span>
+      · Leaders: <span class="le-top">${top}</span>
+      · Hash: <span class="le-hash">${s.hash}</span>
+      ${chain}
     </div>`;
-  }).join('')||'<div style="color:var(--gray);font-size:.75rem;padding:20px 0 0">No claims audited yet. Submit a claim or run a demo.</div>';
-  updateKPIs();
+  }).join('');
 }
 
-function addThought(phase, msg){
-  const el=document.getElementById('thoughts');
-  el.innerHTML+=`<div class="thought"><span class="phase ${esc(phase)}">[${esc(phase)}]</span>${esc(msg)}</div>`;
-  el.scrollTop=el.scrollHeight;
-}
+// ── SSE connection ────────────────────────────────────────────────────────────
+function connect() {
+  const sse = new EventSource('/sse');
 
-function updateStatus(running){
-  const badge=document.getElementById('statusBadge');
-  badge.className='badge '+(running?'running':'idle');
-  badge.textContent=running?'AUDITING':'IDLE';
-}
-
-async function loadState(){
-  const r=await fetch('/api/state');
-  const d=await r.json();
-  docket=d.docket||[];
-  renderDocket();
-  updateStatus(d.running);
-}
-
-async function loadReceipts(){
-  const r=await fetch('/api/receipts');
-  const d=await r.json();
-  receipts=d.receipts.length;
-  chainOk=d.verify.ok;
-  const el=document.getElementById('receipts');
-  el.innerHTML=`${receipts} entries &nbsp;·&nbsp; Chain: <span style="color:${chainOk?'var(--green)':'var(--red)'}">${chainOk?'INTACT':'BROKEN'}</span>`;
-}
-
-// SSE
-const es=new EventSource('/events');
-es.addEventListener('state',e=>{
-  const d=JSON.parse(e.data);
-  if(d.docket){docket=d.docket; renderDocket();}
-  updateStatus(d.running);
-});
-es.addEventListener('step',e=>{
-  const d=JSON.parse(e.data);
-  addThought(d.step,d.msg);
-});
-es.addEventListener('verdict',e=>{
-  const d=JSON.parse(e.data);
-  // update or add to docket
-  const idx=docket.findIndex(x=>x.claimId===d.claimId);
-  if(idx>=0)docket[idx]=d; else docket.unshift(d);
-  renderDocket();
-  loadReceipts();
-  const el=document.getElementById('thoughts');
-  el.innerHTML+=`<div class="verdict-full">
-    <div style="font-size:.8rem;font-weight:700;color:${d.verdict==='CONFIRMED'?'var(--green)':d.verdict==='DISPUTED'?'var(--red)':'var(--orange)'}">
-      Verdict: ${esc(d.verdict)}
-    </div>
-    <div style="font-size:.7rem;color:var(--gray);margin-top:4px">Claim ${esc(d.claimId)} · ${new Date(d.auditedAt).toLocaleTimeString()}</div>
-  </div>`;
-  el.scrollTop=el.scrollHeight;
-});
-es.addEventListener('error',e=>{
-  const d=JSON.parse(e.data||'{}');
-  addThought('ERROR',d.msg||'unknown error');
-});
-
-async function submitClaim(){
-  const claim={
-    agent:document.getElementById('claimAgent').value||'My Agent',
-    symbol:document.getElementById('claimSymbol').value,
-    direction:document.getElementById('claimDir').value,
-    signal_basis:document.getElementById('claimBasis').value,
-    currency:document.getElementById('claimCurrency').value,
+  sse.onopen = () => {
+    statusEl.textContent = '● LIVE';
+    statusEl.className = 'live';
   };
-  document.getElementById('thoughts').innerHTML='';
-  addThought('SUBMIT','Submitting claim for audit...');
-  await fetch('/api/claims',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(claim)});
+
+  sse.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+    if (msg.type === 'rank') {
+      renderTable(msg.data);
+      lastUpdate.textContent = `Last updated: ${new Date(msg.ts).toLocaleTimeString()} · ${msg.data.length} indices`;
+    }
+  };
+
+  sse.onerror = () => {
+    statusEl.textContent = '○ reconnecting…';
+    statusEl.className = '';
+    sse.close();
+    setTimeout(connect, 3000);
+  };
 }
 
-async function runDemo(idx){
-  document.getElementById('thoughts').innerHTML='';
-  addThought('DEMO','Loading demo claim #'+(idx+1)+'...');
-  await fetch('/api/audit-demo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({index:idx})});
-}
+connect();
 
-loadState();
-loadReceipts();
+// Fetch snapshot ledger every 5min
+async function loadLedger() {
+  try {
+    const res = await fetch('/api/snapshots');
+    const { data } = await res.json();
+    renderLedger(data);
+  } catch {}
+}
+loadLedger();
+setInterval(loadLedger, 5 * 60 * 1000);
 </script>
 </body>
 </html>

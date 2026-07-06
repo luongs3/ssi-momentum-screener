@@ -61,6 +61,23 @@ export async function getKlines(symbol, { interval = '1m', limit = 60, startTime
   return r.data;
 }
 
+// ── Snapshot order (on-chain fingerprint via clientOrderId) ───────────────────
+// Encodes snapshot hash into the clientOrderId field of a minimal dust order.
+// clientOrderId accepts arbitrary string per SoDEX REST spec.
+// Falls through to local-only logging if testnet is unavailable.
+export async function placeSnapshotOrder(hash, _snapshotMeta) {
+  // Attempt a minimal GET to confirm testnet is up before trying authenticated write
+  const { ok } = await ping();
+  if (!ok) throw new Error('SoDEX testnet unreachable');
+
+  // Without a funded testnet wallet, we record the hash intent locally.
+  // The on-chain path (EIP-712 signed order) is wired once a testnet key is obtained.
+  // For now: store hash in module scope; snapshot.js will display it in the ledger.
+  // TODO: replace with real EIP-712 signed order when testnet SOSO/USDC faucet is used.
+  console.log(`[sodex] snapshot hash recorded: ${hash} (local — testnet key pending)`);
+  return null; // null = local-only; a txId string = on-chain confirmed
+}
+
 // ── Health check ───────────────────────────────────────────────────────────
 export async function ping() {
   try {
