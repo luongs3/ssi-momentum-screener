@@ -246,27 +246,48 @@ async function toggleNews(ticker, cssClass, panel, tr) {
     p.innerHTML = '';
   });
 
-  if (isOpen) return; // was open → just close
+  if (isOpen) return;
 
   panel.classList.add('open');
-  panel.innerHTML = `<h3>📰 ${ticker} — Related SoSoValue News</h3><div class="news-loading">Loading…</div>`;
+  panel.innerHTML = `<h3>Loading ${ticker} detail…</h3>`;
 
-  try {
-    const res = await fetch('/api/news/' + ticker);
-    const { items } = await res.json();
-    if (!items || items.length === 0) {
-      panel.innerHTML = `<h3>📰 ${ticker} — Related News</h3><div class="no-news">No recent news matched for this index.</div>`;
-      return;
-    }
-    panel.innerHTML = `<h3>📰 ${ticker} — Why it's moving (SoSoValue News)</h3>` +
-      items.map(n => `
-        <div class="news-item">
-          <a href="${n.url || '#'}" target="_blank">${n.title}</a>
-          ${n.time ? `<span class="news-time">${new Date(n.time * 1000 || n.time).toLocaleTimeString()}</span>` : ''}
-        </div>`).join('');
-  } catch(e) {
-    panel.innerHTML = `<h3>📰 ${ticker}</h3><div class="no-news">Failed to load news: ${e.message}</div>`;
-  }
+  // Fetch news + constituents in parallel
+  const [newsRes, constRes] = await Promise.allSettled([
+    fetch('/api/news/' + ticker).then(r => r.json()),
+    fetch('/api/constituents/' + ticker).then(r => r.json()),
+  ]);
+
+  const newsItems  = newsRes.status  === 'fulfilled' ? (newsRes.value.items  || []) : [];
+  const constItems = constRes.status === 'fulfilled' ? (constRes.value.data  || []) : [];
+
+  // Build constituent chips
+  const constHtml = constItems.length
+    ? `<div style="margin-bottom:10px">
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">🔑 Top Constituents</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          ${constItems.slice(0,8).map(c =>
+            `<span style="background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.2);color:var(--accent);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">
+              ${c.symbol.replace(/-/g,' ').replace(/\b\w/g,l=>l.toUpperCase())}
+              ${c.weight ? `<span style="color:var(--muted);font-weight:400"> ${(c.weight*100).toFixed(1)}%</span>` : ''}
+            </span>`
+          ).join('')}
+        </div>
+      </div>`
+    : '';
+
+  // Build news items
+  const newsHtml = newsItems.length
+    ? `<div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">📰 Why It's Moving (SoSoValue News)</div>
+        ${newsItems.map(n => `
+          <div class="news-item">
+            <a href="${n.url || '#'}" target="_blank">${n.title}</a>
+            ${n.time ? `<span class="news-time">${new Date(n.time > 1e10 ? n.time : n.time*1000).toLocaleTimeString()}</span>` : ''}
+          </div>`).join('')}
+      </div>`
+    : `<div class="no-news">No recent news matched for this index.</div>`;
+
+  panel.innerHTML = `<h3>${ticker} — Sector Detail</h3>${constHtml}${newsHtml}`;
 }
 
 function renderLedger(data) {

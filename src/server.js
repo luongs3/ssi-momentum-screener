@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { rankAll, getCorrelatedNews } from './screener.js';
 import { getLatestSnapshots, scheduleSnapshots } from './snapshot.js';
+import { getConstituents } from './constituents.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -51,6 +52,15 @@ app.get('/api/news/:ticker', async (req, res) => {
   try {
     const items = await getCorrelatedNews(req.params.ticker);
     res.json({ ok: true, ticker: req.params.ticker, items });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+app.get('/api/constituents/:ticker', async (req, res) => {
+  try {
+    const data = await getConstituents(req.params.ticker);
+    res.json({ ok: true, ticker: req.params.ticker, data });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
   }
