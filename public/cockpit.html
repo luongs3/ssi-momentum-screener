@@ -298,14 +298,17 @@ function renderLedger(data) {
   }
   snapCount.textContent = data.length + ' entries';
   ledgerBody.innerHTML = data.slice(0, 12).map(s => {
-    const top = s.top3.map(t => `${t.ticker} (${t.momentum})`).join(' · ');
+    const top = s.top3.map(t => `${t.ticker.replace('ssi','')} (${t.momentum})`).join(' › ');
+    const prices = s.sodexPrices && Object.keys(s.sodexPrices).length
+      ? ' · 🔗 ' + Object.entries(s.sodexPrices).map(([k,v]) => `${k.replace('ssi','')}=$${v.lastPx}`).join(' ')
+      : '';
     const chain = s.onChain
-      ? `<span class="le-onchain">⛓ on-chain</span>`
+      ? `<span class="le-onchain">⛓ ValueChain</span>`
       : `<span class="le-local">📋 local</span>`;
     return `<div class="ledger-entry">
       <span class="le-time">${s.iso || s.ts}</span>
-      · Leaders: <span class="le-top">${top}</span>
-      · Hash: <span class="le-hash">${s.hash}</span>
+      · <span class="le-top">${top}</span>${prices}
+      · <span class="le-hash">${s.hash}</span>
       ${chain}
     </div>`;
   }).join('');
